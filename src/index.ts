@@ -1,6 +1,6 @@
-import { directoryLoader } from "./loader"
+import { directoryLoader } from "./loader.js"
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
-import { OpenAIEmbeddings } from "@langchain/openai"
+import { ChatOpenAI, OpenAIClient, OpenAIEmbeddings } from "@langchain/openai"
 import { FaissStore } from "@langchain/community/vectorstores/faiss"
 import dotenv from "@dotenvx/dotenvx"
 
@@ -20,10 +20,16 @@ const splitter = new RecursiveCharacterTextSplitter({
 const splitDocs = await splitter.splitDocuments(docs)
 const embeddings = new OpenAIEmbeddings({
   model: "text-embedding-ada-002",
+  timeout: 1,
+  configuration: {
+    baseURL: process.env.OPENAI_BASE_URL,
+  },
 })
 
 const vectorStore = await FaissStore.fromDocuments(splitDocs, embeddings)
-await vectorStore.save("src/db/vector")
+await vectorStore.save("./src/db/vector")
 
-// const splitDoc = splitDocs[0].pageContent
-// const res = await embeddings.embedQuery(splitDoc)
+const splitDoc = splitDocs[0].pageContent
+const res = await embeddings.embedQuery(splitDoc)
+
+console.log(res)
