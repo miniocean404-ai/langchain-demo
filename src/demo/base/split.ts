@@ -22,3 +22,12 @@ export async function splitText(text: string) {
 
   return await splitter.createDocuments([text])
 }
+
+export async function splitMarkdown(text: string) {
+  const splitter = RecursiveCharacterTextSplitter.fromLanguage("markdown", {
+    chunkSize: 1000,
+    chunkOverlap: 20,
+  })
+
+  return await splitter.createDocuments([text])
+}

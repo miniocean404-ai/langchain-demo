@@ -3,7 +3,7 @@ import type { VectorStore } from "@langchain/core/vectorstores"
 import { ContextualCompressionRetriever } from "langchain/retrievers/contextual_compression"
 import { LLMChainExtractor } from "langchain/retrievers/document_compressors/chain_extract"
 import { MultiQueryRetriever } from "langchain/retrievers/multi_query"
-import { model } from "src/openai.js"
+import { model } from "src/demo/base/openai.js"
 import { EnsembleRetriever } from "langchain/retrievers/ensemble"
 import { Document } from "langchain/document"
 

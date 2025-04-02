@@ -3,7 +3,7 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter"
 import { FaissStore } from "@langchain/community/vectorstores/faiss"
 import type { Document } from "langchain/document"
 import { MemoryVectorStore } from "langchain/vectorstores/memory"
-import { embeddings } from "src/openai.js"
+import { embeddings } from "src/demo/base/openai.js"
 
 // 将 RecursiveCharacterTextSplitter 分割的文档进行向量化
 export async function vectorSave(docs: Document[]) {
