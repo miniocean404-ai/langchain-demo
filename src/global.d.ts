@@ -1,3 +1,5 @@
+/// <reference types="@langchain/core/documents" />
+
 declare namespace NodeJS {
   declare interface ProcessEnv {
     // openapi key

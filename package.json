@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "dotenvx run -f .env.devlopment -f .env -- tsx watch src/index.ts",
     "build": "tsc --outDir dist"
   },
   "keywords": [],
