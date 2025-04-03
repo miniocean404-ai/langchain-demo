@@ -1,0 +1,128 @@
+---
+description: 编写和审查代码时强制执行一致的前端代码风格规范
+globs: src/**/*.{js,jsx,ts,tsx,html,css,scss,less}
+alwaysApply: false
+---
+# 前端代码风格规范
+
+## Context
+- 编写前端代码时（JS/TS/HTML/CSS）
+- 进行代码审查时
+- 建立新的前端项目时
+- 配置代码格式化工具时
+
+## Requirements
+
+### JavaScript/TypeScript 规范
+- 使用 2 个空格进行缩进
+- 每行最大长度：80 个字符
+- 语句结尾使用分号
+- 字符串使用单引号
+- 字符串插值使用模板字符串
+- 多行列表末尾添加逗号
+- 禁止未使用的变量和导入
+- 生产环境代码中禁止 console.log
+- 优先使用 const 声明变量，避免使用 var
+- 回调函数使用箭头函数
+
+### 命名规范
+- 组件名：大驼峰命名（UserProfile）
+- 变量/函数：小驼峰命名（getUserData）
+- 常量：大写下划线（MAX_RETRY_COUNT）
+- 私有属性：下划线小驼峰（_privateVar）
+- CSS 类名：中划线（user-profile）
+- 文件名：中划线（user-profile.tsx）
+
+### HTML/CSS 规范
+- 使用语义化 HTML 标签
+- 自闭合标签必须闭合
+- CSS 属性按字母顺序排序
+- 使用 CSS 自定义属性进行主题设置
+- 避免使用内联样式
+- 使用 BEM 命名规范
+- SCSS 嵌套不超过 3 层
+
+### 代码组织
+- 一个文件只包含一个组件
+- 相关导入语句分组
+- 导入顺序：外部依赖 > 内部模块
+- CSS 属性按类型分组
+- 保持函数简短且职责单一
+- 使用有意义的注释
+
+## Examples
+
+<example>
+// 好的 JavaScript 代码
+const calculateTotal = (items) => {
+  const TAX_RATE = 0.1;
+  
+  return items.reduce((sum, item) => {
+    const itemTotal = item.price * item.quantity;
+    return sum + itemTotal;
+  }, 0) * (1 + TAX_RATE);
+};
+
+// 好的 React 组件
+const UserProfile = ({ user }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  
+  return (
+    <div className="user-profile">
+      <h1 className="user-profile__name">{user.name}</h1>
+      <p className="user-profile__email">{user.email}</p>
+    </div>
+  );
+};
+
+// 好的 CSS 代码
+.user-profile {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-medium);
+  
+  &__name {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+  }
+}
+</example>
+
+<example type="invalid">
+// 不好的 JavaScript 代码
+var calc = function(i) {
+    var t = .1;
+    var total = 0;
+    for(var x=0;x<i.length;x++) {
+        total += i[x].p * i[x].q
+    }
+    return total * (1+t)
+}
+
+// 不好的 React 组件
+function profile(p) {
+    var [l, setL] = useState(false)
+    return <div class='profile'>
+        <h1 style={{color: 'red'}}>{p.n}</h1>
+        <p>{p.e}</p>
+    </div>
+}
+
+// 不好的 CSS 代码
+.profile {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+}
+.profile h1 {
+    color: #FF0000;
+    font-size: 24px;
+}
+</example>
+
+<critical>
+- 代码合并前必须通过代码检查
+- 所有新代码必须遵循这些规范
+- 特殊情况需要团队讨论并记录
+- 必须使用自动格式化工具
+</critical>

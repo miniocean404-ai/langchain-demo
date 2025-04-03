@@ -1,5 +1,5 @@
 ---
-description: 标准 rules 基文件
+description: 标准化给 cursor 创建其他 rules 的一些提示
 globs: 
 alwaysApply: false
 ---

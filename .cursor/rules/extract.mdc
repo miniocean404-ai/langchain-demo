@@ -1,0 +1,258 @@
+---
+description: 提取代码核心功能当被请求时以展示关键实现细节
+globs: 
+alwaysApply: false
+---
+
+# 代码库提取与隔离
+
+## Context
+- 当需要从较大的代码库中提取出可运行的库代码时应用
+- 当需要创建一个独立的、自包含的代码库版本时
+- 当需要移除非核心功能，仅保留关键实现逻辑时
+- 当需要创建一个干净的示例库以供学习或参考时
+
+## Requirements
+- 识别并提取代码的核心功能和关键组件
+- 确保提取的代码可以独立运行，不依赖原始代码库的其他部分
+- 保持库风格的代码组织和结构
+- 修正所有导入语句，使其指向新文件夹内的正确位置
+- 删除简单的时间处理功能和非必要的辅助功能
+- 创建包含所有用法示例的 markdown 文档
+- 将所有提取的代码放置在一个新的独立文件夹中
+- 确保没有对新文件夹外部的导入依赖
+- 保留必要的类型定义和接口
+
+## Examples
+<example>
+好的提取示例：
+
+原始项目结构：
+```
+src/
+  utils/
+    time.js
+    format.js
+    validators.js
+  core/
+    processor.js
+    transformer.js
+  models/
+    user.js
+    data.js
+  index.js
+```
+
+提取后的结构（新文件夹）：
+```
+extracted-lib/
+  utils/
+    format.js      # 只保留核心格式化功能
+    validators.js  # 只保留核心验证功能
+  core/
+    processor.js   # 保留核心处理逻辑
+    transformer.js # 保留核心转换逻辑
+  models/
+    data.js        # 保留必要的数据模型
+  index.js         # 导出所有需要的组件
+  README.md        # 使用示例文档
+```
+
+原始的 processor.js:
+```javascript
+import { formatDate, formatCurrency } from '../utils/format';
+import { validateInput } from '../utils/validators';
+import { getCurrentTime, getTimeZone } from '../utils/time';
+import { User } from '../models/user';
+import { DataModel } from '../models/data';
+
+export class Processor {
+  constructor(config) {
+    this.config = config;
+    this.startTime = getCurrentTime();
+    this.timezone = getTimeZone();
+    console.log(`Processor started at ${formatDate(this.startTime)}`);
+  }
+
+  async process(input) {
+    // Log processing start
+    console.log(`Processing started for input: ${JSON.stringify(input)}`);
+
+    // Validate input
+    if (!validateInput(input)) {
+      throw new Error('Invalid input');
+    }
+
+    // Process data
+    const user = new User(input.userId);
+    const data = new DataModel(input.data);
+    const result = await this._processData(data, user);
+
+    // Format output
+    const output = {
+      result,
+      formattedAmount: formatCurrency(result.amount),
+      processedAt: formatDate(getCurrentTime()),
+      processingTime: getCurrentTime() - this.startTime
+    };
+
+    // Log completion
+    console.log(`Processing completed in ${output.processingTime}ms`);
+
+    return output;
+  }
+
+  async _processData(data, user) {
+    // Core data processing logic here
+    const processed = data.transform();
+    return {
+      id: data.id,
+      userId: user.id,
+      amount: processed.value * this.config.multiplier,
+      metadata: processed.metadata
+    };
+  }
+}
+```
+
+提取后的 processor.js:
+```javascript
+import { formatCurrency } from '../utils/format';
+import { validateInput } from '../utils/validators';
+import { DataModel } from '../models/data';
+
+export class Processor {
+  constructor(config) {
+    this.config = config;
+  }
+
+  async process(input) {
+    // Validate input
+    if (!validateInput(input)) {
+      throw new Error('Invalid input');
+    }
+
+    // Process data
+    const data = new DataModel(input.data);
+    const result = await this._processData(data, input.userId);
+
+    // Format output
+    const output = {
+      result,
+      formattedAmount: formatCurrency(result.amount)
+    };
+
+    return output;
+  }
+
+  async _processData(data, userId) {
+    // Core data processing logic here
+    const processed = data.transform();
+    return {
+      id: data.id,
+      userId: userId,
+      amount: processed.value * this.config.multiplier,
+      metadata: processed.metadata
+    };
+  }
+}
+```
+
+README.md:
+```markdown
+# 提取的核心库
+
+这个库包含了原项目的核心功能，可以独立运行。
+
+## 使用示例
+
+```javascript
+import { Processor } from './core/processor';
+
+// 创建处理器实例
+const processor = new Processor({ multiplier: 1.5 });
+
+// 处理数据
+const result = await processor.process({
+  userId: '12345',
+  data: {
+    id: 'data-001',
+    value: 100,
+    metadata: { type: 'sample' }
+  }
+});
+
+console.log(result);
+```
+```
+
+解释：提取后的代码移除了所有与时间相关的功能、日志记录和不必要的依赖（如User类），同时保持了核心数据处理功能。所有导入都指向提取文件夹内的文件，确保了代码可以独立运行。还提供了一个README.md文件，展示如何使用提取出的库。
+</example>
+
+<example type="invalid">
+不好的提取示例：
+
+提取后的 processor.js:
+```javascript
+import { formatDate, formatCurrency } from '../utils/format';
+import { validateInput } from '../utils/validators';
+import { getCurrentTime, getTimeZone } from '../../../src/utils/time';
+import { User } from '../models/user';
+import { DataModel } from '../models/data';
+
+export class Processor {
+  constructor(config) {
+    this.config = config;
+    this.startTime = getCurrentTime();
+    this.timezone = getTimeZone();
+    console.log(`Processor started at ${formatDate(this.startTime)}`);
+  }
+
+  async process(input) {
+    // Log processing start
+    console.log(`Processing started for input: ${JSON.stringify(input)}`);
+
+    // Validate input
+    if (!validateInput(input)) {
+      throw new Error('Invalid input');
+    }
+
+    // Process data
+    const user = new User(input.userId);
+    const data = new DataModel(input.data);
+    const result = await this._processData(data, user);
+
+    // Format output
+    const output = {
+      result,
+      formattedAmount: formatCurrency(result.amount),
+      processedAt: formatDate(getCurrentTime()),
+      processingTime: getCurrentTime() - this.startTime
+    };
+
+    // Log completion
+    console.log(`Processing completed in ${output.processingTime}ms`);
+
+    return output;
+  }
+
+  async _processData(data, user) {
+    // Core data processing logic here
+    const processed = data.transform();
+    return {
+      id: data.id,
+      userId: user.id,
+      amount: processed.value * this.config.multiplier,
+      metadata: processed.metadata
+    };
+  }
+}
+```
+
+解释：这个提取示例有以下问题：
+1. 仍然依赖原始代码库中的时间功能（导入路径指向外部：`../../../src/utils/time`）
+2. 保留了所有非核心功能，如时间记录和日志记录
+3. 没有移除不必要的依赖（如User类）
+4. 没有提供示例文档
+5. 没有遵循库风格的组织结构
+</example>
