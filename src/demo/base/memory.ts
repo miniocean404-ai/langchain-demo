@@ -3,7 +3,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers"
 import { ChatPromptTemplate, MessagesPlaceholder } from "@langchain/core/prompts"
 import { RunnablePassthrough, RunnableSequence, RunnableWithMessageHistory } from "@langchain/core/runnables"
 import { ChatMessageHistory } from "langchain/memory"
-import { model } from "src/demo/base/openai.js"
+import { model } from "./openai.js"
 
 const prompt = ChatPromptTemplate.fromMessages([
   [
